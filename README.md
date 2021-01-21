@@ -52,22 +52,28 @@ Underline is not preserved due to a limitation in Markdown.
 
 Hyperlinks are not preserved, since they are not exported from Apple Notes.
 
-Attachments (other than pictures) are not uploaded.  I've started exporting the
-metadata for attachments, but have not been able to reliably determine the folder on
-the filesystem.
+Attachments (other than pictures) are not uploaded.  We can provide some metadata for
+attachments to help track them down, but the note does not contain enough information
+to add them in the export.
 
 Tables are converted to Notion databases, which may alter the appearance or structure
 for some types of tables.
 
 # Known Issues
 
-Please report any `yaml.parser.ParserError` errors.  These are caused by unexpected
-characters in the note title or other metadata.
-
 The script is VERY slow.  This is due to the way blocks are built using the
 [notion-py](https://github.com/jamalex/notion-py) client.  Essentially, each "block"
 in the source note is reconstructed on the server one-by-one.  I'm sure there are ways
 to improve this, I just haven't taken the time to do so.
+
+Some characters in title blocks (especially quotes) or styling can cause odd behavior
+in the note body.
+
+Please report any `yaml.parser.ParserError` errors.  These are caused by unexpected
+characters in the note title or other metadata.
+
+Some attachments (like scanned documents) are not captured properly, since they are
+actually stored as multiple files in the account.
 
 Network timeouts are common...  Using the Import Log will help resume from a failed
 session.
