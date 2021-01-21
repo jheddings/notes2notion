@@ -149,6 +149,13 @@ class PageBuilder(object):
         self.logger.debug('builder ready - %s', page.title)
 
     #---------------------------------------------------------------------------
+    def get_url(self):
+        if self.page is None:
+            return None
+
+        return self.page.get_browseable_url()
+
+    #---------------------------------------------------------------------------
     def construct(self, note):
         note_meta = note['meta']
 
@@ -163,7 +170,7 @@ class PageBuilder(object):
             self.page.children.add_new(SubheaderBlock, title='Attachments')
 
             for attachment in note['attachments']:
-                self.logger.debug('attachments[%s] => %s', attachment['id'], attachment['name'])
+                self.logger.debug('attachment[%s] => %s', attachment['id'], attachment['name'])
 
                 # TODO upload attachments
                 if self.include_meta:
@@ -213,18 +220,20 @@ class PageBuilder(object):
     def append_block(self, elem):
         if elem is None: return None
 
-        # track blocks that are not directly mapped
-        pending_block = list()
+        # collect blocks that are not directly mapped
+        pending_blocks = list()
 
         for child in elem.children:
             self.logger.debug('processing child - %s', child.name)
 
             # skip empty line breaks
             if child.name == 'br':
+                self.logger.debug('skipping line break')
                 continue
 
             # if this is the first h1 child on the page, assume it is the title
             elif child.name == 'h1' and len(self.page.children) == 0:
+                self.logger.debug('skipping title element')
                 continue
 
             # handle images (may be more than one per block)
@@ -242,14 +251,15 @@ class PageBuilder(object):
             # track text from remaining blocks
             else:
                 text = get_block_text(child)
-                pending_block.append(text)
+                self.logger.debug('pending block [%d]: "%s..."',
+                                  len(pending_blocks), text[:7])
 
-        #--- XXX working here
+                pending_blocks.append(text)
 
         # deal with pending blocks (if we found any)
-        self.logger.debug('block complete; %d pending block(s)', len(pending_block))
-        if len(pending_block) > 0:
-            text = ' '.join(pending_block)
+        self.logger.debug('block complete; %d pending block(s)', len(pending_blocks))
+        if len(pending_blocks) > 0:
+            text = ' '.join(pending_blocks)
             self.page.children.add_new(TextBlock, title=text)
 
     #---------------------------------------------------------------------------
@@ -257,13 +267,11 @@ class PageBuilder(object):
         block_type = block_map.get(elem.name, TextBlock)
         text = get_block_text(elem)
 
-        self.logger.debug(
-            'mapped to Notion block: %s (%d bytes)',
-            block_type, -1 if text is None else len(text)
-        )
-
         if text is None or len(text) == 0:
+            self.logger.debug('empty text block; skipping')
             return
+
+        self.logger.debug('mapped to Notion block: %s => "%s..."', block_type, text[:7])
 
         block = self.page.children.add_new(block_type, title=text)
         self.logger.debug('block => %s', block.id)
@@ -280,7 +288,7 @@ class PageBuilder(object):
 
         for li in list_elem.find_all('li', recursive=False):
             text = get_block_text(li)
-            self.logger.debug('adding list item: %s', text[:7])
+            self.logger.debug('adding list item: "%s..."', text[:7])
             self.page.children.add_new(block_type, title=text)
 
     #---------------------------------------------------------------------------
@@ -385,7 +393,7 @@ class PageBuilder(object):
                 if text is None: continue
 
                 col_id = 'title' if idx == 0 else f'c{idx}'
-                self.logger.debug('table data: %s => {%s}', col_id, text[:7])
+                self.logger.debug('table data: %s => "%s..."', col_id, text[:7])
 
                 if block.collection is None:
                     thead.append(text)
