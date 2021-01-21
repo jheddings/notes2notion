@@ -10,8 +10,10 @@
 import os
 import logging
 import yaml
+import requests
 
 from notion.client import NotionClient
+from notion.block import PageBlock
 
 # local imports
 import apple
@@ -61,15 +63,32 @@ logger = logging.getLogger('notes2notion')
 
 client = NotionClient(token_v2=conf['token_v2'])
 top_page = client.get_block(conf['import_page_url'])
-archive = builder.PageArchive(top_page)
+#archive = builder.PageArchive(top_page)
 tracker = logbook.ImportLog(client, conf['import_log_url'])
 
-# load each note and upload to Notion
-for note in apple.Notes():
+notes = apple.Notes()
+note_ids = notes.get_all_ids()
+
+# extracting notes one at a time takes a VERY long time...  we will use the
+# ID's instead of the default iterator and skip notes that are 'Finished'
+
+for note_id in note_ids:
+
+    # look for an existing 'Finished' entry, otherwise start a new one
+    log = tracker.get_latest_entry(note_id)
+    if log is not None and log.status == 'Finished':
+        logger.debug('skipping - %s [Finished]', log.name)
+        continue
+
+    note = notes[note_id]
+
+    if note is None:
+        # XXX should we track in the import log?
+        logger.warning('empty note; skipping')
+        continue
 
     note_meta = note['meta']
     note_name = note_meta['name']
-    note_id = note_meta['id']
 
     # skip locked notes
     if note_meta['locked']:
@@ -78,22 +97,25 @@ for note in apple.Notes():
 
     logger.info('Processing - %s', note_name)
 
-    # look for an existing 'Finished' entry, otherwise start a new one
-    log = tracker.get_latest_entry(note_id)
-    if log is not None and log.status == 'Finished':
-        logger.debug('skipping - %s [Finished]', note_name)
-        continue
-
     log = tracker.new_entry(
         name=note_name, status='Pending', note_id=note_id
     )
 
-    # process the note in the target archive
-    page = archive.store(note)
-    log.page = page.get_browseable_url()
+    # TODO support the folder heirarchy from the note metadata
+    page = top_page.children.add_new(PageBlock, title=note_name)
+    logger.debug('page => %s', page.id)
 
-    # finally, update the logbook if needed...
-    if log is not None: log.status = 'Finished'
+    # update the location of the page we are about to build...
+    if log is not None:
+        log.page = page.get_browseable_url()
+
+    try:
+        builder.PageBuilder(page).construct(note)
+        if log is not None: log.status = 'Finished'
+
+    except requests.exceptions.HTTPError as e:
+        logger.error('HTTPError - %s', e)
+        if log is not None: log.status = 'Failed'
 
     logger.debug('processing complete - %s', note_name)
 
