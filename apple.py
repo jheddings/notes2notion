@@ -47,46 +47,43 @@ class Notes(object):
 
     #---------------------------------------------------------------------------
     def __iter__(self):
-        # the 'notes' object serializes as a list of Core Data URL's...
-        notes_raw = tell_notes('return notes of default account')
-        note_links = re.split(r', *', notes_raw)
-        note_ids = [ re.sub(r'^.*/(p[0-9]+)', r'\1', link) for link in note_links]
-
+        note_ids = self.get_all_ids()
         self.logger.debug('starting iterator: %d notes', len(note_ids))
-
         return Notes.Iterator(self, note_ids)
 
     #---------------------------------------------------------------------------
-    class Iterator(object):
-        outer = None
-        iter_idx = None
+    def __getitem__(self, note_id):
+        return self.get(note_id)
 
-        #-----------------------------------------------------------------------
-        def __init__(self, outer, note_ids):
-            self.note_ids = note_ids
-            self.iter_idx = 0
-            self.outer = outer
-            self.logger = logging.getLogger('notes2notion.apple.Notes.Iterator')
+    #---------------------------------------------------------------------------
+    def get_all_ids(self):
+        # the 'notes' object serializes as a list of Core Data URL's...
+        notes_raw = tell_notes('return notes of default account')
+        notes = re.split(r', *', notes_raw)
+        self.logger.debug('parsing %d links', len(notes))
 
-        #-----------------------------------------------------------------------
-        def __next__(self):
-            self.logger.debug('load next note: %d', self.iter_idx)
+        # extract the full core data identifier; the strings from our list
+        # contain extra identifiers at the beginning (note id x-coredata...)
+        note_ids = [
+            re.sub(r'^.*(x-coredata://.*/p[0-9]+)', r'\1', x) for x in notes
+        ]
 
-            # make sure we were properly initialized
-            if self.iter_idx is None or self.note_ids is None:
-                raise ValueError
+        return note_ids
 
-            # make sure the next index is in bounds
-            if self.iter_idx < 0 or self.iter_idx >= len(self.note_ids):
-                raise StopIteration
+    #---------------------------------------------------------------------------
+    def delete(self, note_id):
+        self.logger.debug('deleting note: %s', note_id)
 
-            note_id = self.note_ids[self.iter_idx]
-            self.logger.debug('next note ID: %s', note_id)
+        # FIXME this isn't working...
 
-            # set up for next call...
-            self.iter_idx += 1
-
-            return self.outer.get(note_id)
+        tell_notes(
+            'repeat with theNote in notes of default account',
+                'set noteID to id of theNote as string',
+                f'if noteID is equal to "{note_id}" then',
+                    'delete theNote'
+                'end if',
+            'end repeat'
+        )
 
     #---------------------------------------------------------------------------
     def get(self, note_id):
@@ -98,11 +95,10 @@ class Notes(object):
         text = tell_notes(
             # there is no direct way to get a note from AppleScript using the ID...
             # so we have to loop over all notes and look for the right one.
+            # on large databases, this takes a VERY long time for some reason
             'repeat with theNote in notes of default account',
                 'set noteID to id of theNote as string',
-
-                # the note ID is a full CoreData URL...  we only want the pXXXX part
-                f'if noteID ends with "/{note_id}" then',
+                f'if noteID is equal to "{note_id}" then',
 
                     # determine the the Notes folder
                     # TODO get the full folder path
@@ -142,20 +138,60 @@ class Notes(object):
 
         # bail if nothing came out...
         if text is None:
-            self.logger.warning('Note is empty: %d', note_id)
+            self.logger.debug('Note is empty: %s', note_id)
             return None
 
         self.logger.debug('parsing %d bytes from export', len(text))
 
         # parse the output from AppleScript into a Python object...
         (text_meta, text_body) = text.split('---', maxsplit=1)
-        note = yaml.load(text_meta, Loader=YamlLoader)
-        note['body'] = text_body.strip()
 
+        # adjust the metadata to account for `quoted form of`
+        text_meta = text_meta.replace("'\\''", "''")
+
+        try:
+            note = yaml.load(text_meta, Loader=YamlLoader)
+        except yaml.YAMLError as e:
+            self.logger.error('YAMLError - %s', e)
+            return None
+
+        note['body'] = text_body.strip()
         self.logger.debug('loaded note - %s', note['meta']['name'])
 
         # DEBUG - print yaml structure from parsed note
         #print(yaml.dump(note))
 
         return note
+
+    #---------------------------------------------------------------------------
+    class Iterator(object):
+        outer = None
+        iter_idx = None
+
+        #-----------------------------------------------------------------------
+        def __init__(self, outer, note_ids):
+            self.note_ids = note_ids
+            self.iter_idx = 0
+            self.outer = outer
+            self.logger = logging.getLogger('notes2notion.apple.Notes.Iterator')
+
+        #-----------------------------------------------------------------------
+        def __next__(self):
+            self.logger.debug('load next note - cursor: %d', self.iter_idx)
+
+            # make sure we were properly initialized
+            if self.iter_idx is None or self.note_ids is None:
+                raise ValueError
+
+            # make sure the next index is in bounds
+            if self.iter_idx < 0 or self.iter_idx >= len(self.note_ids):
+                raise StopIteration
+
+            note_id = self.note_ids[self.iter_idx]
+            self.logger.debug('next note ID: %s', note_id)
+
+            # set up for next call...
+            self.iter_idx += 1
+
+            return self.outer.get(note_id)
 
