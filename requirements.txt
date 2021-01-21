@@ -2,3 +2,4 @@ applescript==2020.12.3
 beautifulsoup4==4.9.3
 bs4==0.0.1
 notion==0.0.27
+requests==2.25.1
