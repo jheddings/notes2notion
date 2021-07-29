@@ -3,7 +3,8 @@
 > :warning: **Unofficial API**: This script uses the unofficial Notion API client.
 Now that the official API client has been released, this script may not work until I
 get the time to port to the official API.  Unfortunately, the new API does not have
-all required features to import content from Notes.
+all required features to import content from Notes.  If anyone would like to contribute,
+feel free to submit a pull request or contact me directly.
 
 This is a basic script that will import from Apple Notes directly into Notion.
 
