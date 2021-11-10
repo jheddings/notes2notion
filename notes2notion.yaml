@@ -1,23 +1,10 @@
 # configuration file for notes2notion
 
 # set this to your current token_v2 cookie (use an inspector in your browser to obtain)
-token_v2: NOTION_TOKEN_V2
+auth_token: NOTION_AUTH_TOKEN
 
 # set this to the top-level page for the import - all notes will be added as sub pages
-import_page_url: ARCHIVE_PAGE_URL
-
-# if this is set, the script will log progress to this database.  additionally,
-# the script will consider status in the log before uploading a document again
-#
-# the database uses the following schema:
-#   Name (title) -> name of the note
-#   Note ID (text) -> the original note ID
-#   Status [Pending, Failed, Finished] -> current status of the migration
-#   Page (URL) -> the link to the imported note
-#   Timestamp (Creation date) [optional] -> date/time of the log entry
-#
-# remove to disable this feature
-import_log_url: IMPORT_LOG_URL
+import_page_id: ARCHIVE_PAGE_ID
 
 # by default, this script will skip the first Title line in the note
 # FIXME this config parameter is not currently working

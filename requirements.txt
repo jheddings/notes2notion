@@ -1,5 +1,8 @@
-applescript==2020.12.3
+applescript==2021.2.9
+notion_client==0.7.1
 beautifulsoup4==4.9.3
 bs4==0.0.1
-notion==0.0.27
-requests==2.25.1
+PyYAML==5.4.1
+requests==2.26.0
+isort==5.10.1
+black==21.10b0
