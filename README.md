@@ -1,6 +1,6 @@
 # notes2notion
 
-> :warning: **Unofficial API**: This script uses the unofficial Notion API client.
+> :warning: **Unofficial API**: This script was written using the unofficial Notion API.
 Now that the official API client has been released, this script may not work until I
 get the time to port to the official API.  Unfortunately, the new API does not have
 all required features to import content from Notes.  If anyone would like to contribute,
@@ -34,8 +34,12 @@ conflicts with your system modules.
 # Usage
 
 You will need to edit the default configuration file.  Specifically, you need to set
-your `token_v2` cookie from an authenticated session, assign a top-level import page
-and (optionally) provide an import log.
+up an integration for your Notion workspace and set the `auth_token` property.  In
+addtion, you will need to provide the ID or URL of the top-level archive page where
+notes will be imported.  This page must be shared with your integration token.
+
+For more information on setting up the workspace integration, visit the official
+[Authorization Guide](https://developers.notion.com/docs/authorization).
 
 There are several other configuration options that control how the script handles note
 content.  Check the configuration document in the script for more details.
@@ -46,8 +50,7 @@ Run the script, as shown:
 python3 main.py --config notes2notion.yaml
 ```
 
-You will see the script print the name of each note as it is processed.  If you
-specified the Import Log, you can see the progress in real time.
+You will see the script print the name of each note as it is processed.
 
 # Limitations
 
@@ -69,6 +72,9 @@ for some types of tables.
 
 Formatting (such as bold, color, etc) and tables are not fully supported.
 
+Attachements (like pictures and scanned documents) are not currently supported.  The
+official API does not have an "upload" method at this time.
+
 The script is VERY slow.  This is due to the way blocks are built using the
 [notion-py](https://github.com/jamalex/notion-py) client.  Essentially, each "block"
 in the source note is reconstructed on the server one-by-one.  I'm sure there are ways
@@ -79,9 +85,3 @@ in the note body.
 
 Please report any `yaml.parser.ParserError` errors.  These are caused by unexpected
 characters in the note title or other metadata.
-
-Some attachments (like scanned documents) are not captured properly, since they are
-actually stored as multiple files in the account.
-
-Network timeouts are common...  Using the Import Log will help resume from a failed
-session.
