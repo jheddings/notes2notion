@@ -27,8 +27,10 @@ endif
 .PHONY: preflight
 
 preflight: venv-configured
-	isort --profile black "$(SRCDIR)"
-	black "$(SRCDIR)"
+	isort --profile black $(SRCDIR)/*.py
+	black $(SRCDIR)/*.py
+	flake8 --ignore=E266,E402,E501 $(SRCDIR)/*.py
+
 
 ################################################################################
 .PHONY: clean
