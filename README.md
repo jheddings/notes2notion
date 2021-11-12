@@ -67,6 +67,8 @@ for some types of tables.
 
 # Known Issues
 
+Formatting (such as bold, color, etc) and tables are not fully supported.
+
 The script is VERY slow.  This is due to the way blocks are built using the
 [notion-py](https://github.com/jamalex/notion-py) client.  Essentially, each "block"
 in the source note is reconstructed on the server one-by-one.  I'm sure there are ways
