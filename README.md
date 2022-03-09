@@ -1,10 +1,7 @@
 # notes2notion
 
-> :warning: **Unofficial API**: This script was written using the unofficial Notion API.
-Now that the official API client has been released, this script may not work until I
-get the time to port to the official API.  Unfortunately, the new API does not have
-all required features to import content from Notes.  If anyone would like to contribute,
-feel free to submit a pull request or contact me directly.
+> :warning: **Work In Progress**: This script is being ported to the official Notion API.
+Some features may be broken or incomplete until they are officially supported.
 
 This is a basic script that will import from Apple Notes directly into Notion.
 
@@ -60,13 +57,6 @@ Specifically, many colors, font sizes, font styles, etc are not preserved.
 Underline is not preserved due to a limitation in Markdown.
 
 Hyperlinks are not preserved, since they are not exported from Apple Notes.
-
-Attachments (other than pictures) are not uploaded.  We can provide some metadata for
-attachments to help track them down, but the note does not contain enough information
-to add them in the export.
-
-Tables are converted to Notion databases, which may alter the appearance or structure
-for some types of tables.
 
 # Known Issues
 
