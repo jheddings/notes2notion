@@ -9,6 +9,7 @@
 
 # TODO handle text formatting using RichTextObjects (not markdown)
 # TODO support embedded pictures (e.g. from Apple Notes)
+# TODO test this with other HTML, especially poorly formatted content
 
 import logging
 import re
@@ -162,11 +163,9 @@ class DocumentParser(object):
         return get_block_text(elem)
 
     def parse_br(self, elem, parent):
-        # skip <br> tags - empty line break
         log.debug("skipping element -- %s", elem.name)
 
     def parse_meta(self, elem, parent):
-        # skip <meta> tags
         log.debug("skipping element -- %s", elem.name)
 
     def parse_div(self, elem, parent):
@@ -194,6 +193,9 @@ class DocumentParser(object):
 
     def parse_list(self, elem, parent, list_type):
         item = None
+
+        # lists are tricky since we have to keep an eye on the containing element,
+        # which tells us the type of list item to create in Notion
 
         for child in elem.children:
 
