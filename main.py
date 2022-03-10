@@ -10,16 +10,7 @@
 import logging
 import os
 
-import yaml
-from notion_client import Client
-
-import apple
-import builder
-
-try:
-    from yaml import CLoader as YamlLoader
-except ImportError:
-    from yaml import Loader as YamlLoader
+import notional
 
 
 def parse_args():
@@ -39,19 +30,27 @@ def parse_args():
 def load_config(config_file):
     import logging.config
 
+    import yaml
+
+    try:
+        from yaml import CLoader as YamlLoader
+    except ImportError:
+        from yaml import Loader as YamlLoader
+
     if not os.path.exists(config_file):
-        print("config file does not exist: %s", config_file)
+        print(f"ERROR: config file does not exist: {config_file}")
         return None
 
     with open(config_file, "r") as fp:
         conf = yaml.load(fp, Loader=YamlLoader)
 
-        # XXX how to update existing loggers?
-
-        if "logging" in conf:
-            logging.config.dictConfig(conf["logging"])
-        else:
-            logging.basicConfig(level=logging.WARN)
+        # determine if logging is already configured...
+        root_logger = logging.getLogger()
+        if not root_logger.hasHandlers():
+            if "logging" in conf:
+                logging.config.dictConfig(conf["logging"])
+            else:
+                logging.basicConfig(level=logging.WARN)
 
     return conf
 
@@ -63,17 +62,13 @@ args = parse_args()
 conf = load_config(args.config)
 log = logging.getLogger(__name__)
 
-# TODO consider switching to Notional ...
-# client = notional.connect(auth=conf["auth_token"])
+import apple
+import builder
 
-client = Client(auth=conf["auth_token"])
-archive = builder.PageArchive(client, conf["import_page_id"])
+session = notional.connect(auth=conf["auth_token"])
+archive = builder.PageArchive(session, conf["import_page_id"])
 
-notes = apple.Notes()
-note_ids = notes.get_all_ids()
-
-for note_id in note_ids:
-    note = notes[note_id]
+for note in apple.Notes():
 
     # skip empty notes
     if note is None:
@@ -83,7 +78,7 @@ for note_id in note_ids:
     note_meta = note["meta"]
     note_name = note_meta["name"]
 
-    # skip locked notes
+    # skip locked notes - they are just empty
     if note_meta["locked"]:
         log.warning("LOCKED - %s", note_name)
         continue
@@ -93,4 +88,4 @@ for note_id in note_ids:
     page = archive.add(note)
 
     log.debug("processing complete - %s", note_name)
-    log.info(":: %s => %s", note_name, page.get("url"))
+    log.info(":: %s => %s", note_name, page.url)
