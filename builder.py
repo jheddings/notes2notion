@@ -10,16 +10,16 @@
 
 import logging
 import re
+from parser import DocumentParser
 
 import yaml
 from notional import blocks
-
-from parser import DocumentParser
 
 log = logging.getLogger(__name__)
 
 # parse embedded image data
 img_data_re = re.compile("^data:image/([^;]+);([^,]+),(.+)$")
+
 
 def markup_text(tag, text):
 
@@ -75,6 +75,7 @@ def get_block_text(block):
     markup = markup_text(block.name, text)
     return markup.strip()
 
+
 class PageBuilder(object):
 
     # TODO make configurable
@@ -92,7 +93,7 @@ class PageBuilder(object):
 
         page = self.session.pages.create(
             parent=self.parent,
-            title=note_meta["name"]
+            title=note_meta["name"],
         )
 
         pdoc = DocumentParser(self.session, page)
@@ -103,16 +104,16 @@ class PageBuilder(object):
             self.import_files(pdoc, note["attachments"])
 
         if self.include_meta or self.include_html:
-            pdoc.append_divider()
+            self.append_divider(pdoc)
 
         if self.include_meta:
             log.debug("adding metadata to page...")
             meta_text = yaml.dump(note_meta).strip()
-            pdoc.append_code(meta_text, language="yaml")
+            self.append_code(meta_text, pdoc, language="yaml")
 
         if self.include_html:
             log.debug("appending raw HTML...")
-            pdoc.append_code(note["body"], language="html")
+            self.append_code(note["body"], pdoc, language="html")
 
         log.debug("finished construction - %s", note_meta["id"])
 
@@ -121,7 +122,7 @@ class PageBuilder(object):
     def import_files(self, pdoc, attachments):
         log.debug("processing attachments...")
 
-        pdoc.append_divider()
+        self.append_divider(pdoc)
 
         for attachment in attachments:
             log.debug("attachment[%s] => %s", attachment["id"], attachment["name"])
@@ -129,4 +130,24 @@ class PageBuilder(object):
             # FIXME until we figure out how to upload attachments, we write metadata
             # to help track them down...  eventually this is only if self.include_meta
             meta_text = yaml.dump(attachment).strip()
-            pdoc.append_code(meta_text, language="yaml")
+            self.append_code(meta_text, pdoc, language="yaml")
+
+    def append_divider(self, pdoc):
+        log.debug("adding divider")
+
+        block = blocks.Divider()
+
+        return pdoc.append(block)
+
+    def append_code(self, text, pdoc, language=None):
+        if text is None or len(text) == 0:
+            return
+
+        log.debug('adding code block: "%s..." [%s]', text[:7], language)
+
+        block = blocks.Code.from_text(text)
+
+        if language:
+            block.code.language = language
+
+        return pdoc.append(block)

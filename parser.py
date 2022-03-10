@@ -7,6 +7,9 @@
 
 # XXX with a bit of work, this could be a general-purpose HTML parser for Notion
 
+# TODO handle text formatting using RichTextObjects (not markdown)
+# TODO support embedded pictures (e.g. from Apple Notes)
+
 import logging
 import re
 
@@ -17,6 +20,7 @@ log = logging.getLogger(__name__)
 
 # parse embedded image data
 img_data_re = re.compile("^data:image/([^;]+);([^,]+),(.+)$")
+
 
 def markup_text(tag, text):
 
@@ -72,8 +76,8 @@ def get_block_text(block):
     markup = markup_text(block.name, text)
     return markup.strip()
 
-class DocumentParser(object):
 
+class DocumentParser(object):
     def __init__(self, session, page):
         self.session = session
         self.page = page
@@ -113,31 +117,11 @@ class DocumentParser(object):
 
         return self.append(block, parent)
 
-    def append_code(self, text, language=None, parent=None):
-        if text is None or len(text) == 0:
-            return
-
-        log.debug('adding code block: "%s..." [%s]', text[:7], language)
-
-        block = blocks.Code.from_text(text)
-
-        if language:
-            block.code.language = language
-
-        return self.append(block, parent)
-
-    def append_divider(self, parent=None):
-        log.debug('adding divider')
-
-        block = blocks.Divider()
-
-        return self.append(block, parent)
-
     def process(self, elem, parent=None):
         log.debug("processing element - %s", elem.name)
 
         if parent is None:
-           parent = self.page
+            parent = self.page
 
         # collect text from unmapped blocks
         pending_text = list()
@@ -167,7 +151,7 @@ class DocumentParser(object):
             log.debug("skipping first element")
             return None
 
-        # handle known blocks 
+        # handle known blocks
         elif hasattr(self, f"parse_{elem.name}"):
             log.debug("parser func -- parse_%s", elem.name)
             pfunc = getattr(self, f"parse_{elem.name}")
@@ -228,12 +212,17 @@ class DocumentParser(object):
         self.parse_list(elem, parent, blocks.NumberedListItem)
 
     def parse_script(self, elem, parent):
-        text = get_block_text(elem)
-        self.append_code(text, parent=parent)
+        self.parse_tt(elem, parent=parent)
 
     def parse_tt(self, elem, parent):
         text = get_block_text(elem)
-        self.append_code(text, parent=parent)
+        block = blocks.Code.from_text(text)
+        self.append(block, parent)
+
+    def parse_blockquote(self, elem, parent):
+        text = get_block_text(elem)
+        block = blocks.Quote.from_text(text)
+        self.append(block, parent)
 
     def parse_table(self, elem, parent):
         log.debug("building table")
