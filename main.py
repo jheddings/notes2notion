@@ -63,10 +63,11 @@ conf = load_config(args.config)
 log = logging.getLogger(__name__)
 
 import apple
-import builder
+from builder import PageBuilder
 
 session = notional.connect(auth=conf["auth_token"])
-archive = builder.PageArchive(session, conf["import_page_id"])
+archive = session.pages.retrieve(conf["import_page_id"])
+builder = PageBuilder(session, archive)
 
 for note in apple.Notes():
 
@@ -85,7 +86,10 @@ for note in apple.Notes():
 
     log.info("Processing - %s", note_name)
 
-    page = archive.add(note)
+    log.debug("creating page - %s", note_name)
+
+    # build the note in-place on the archive page
+    page = builder.build(note)
 
     log.debug("processing complete - %s", note_name)
-    log.info(":: %s => %s", note_name, page.url)
+    log.info(":: %s => %s", page.Title, page.url)

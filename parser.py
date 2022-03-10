@@ -5,13 +5,11 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# XXX with a little work, this could be a more general-purpose HTML parser for Notion
-# perhaps we could pull out the document parser and include it with Notional?
+# XXX with a bit of work, this could be a general-purpose HTML parser for Notion
 
 import logging
 import re
 
-import yaml
 from bs4 import BeautifulSoup
 from notional import blocks
 
@@ -76,84 +74,48 @@ def get_block_text(block):
 
 class DocumentParser(object):
 
-    # TODO make configurable
-    include_meta: bool = True
-    include_html: bool = True
-
-    def __init__(self):
-        self.title = None
-        self.content = list()
+    def __init__(self, session, page):
+        self.session = session
+        self.page = page
 
         self._first_block = True
 
-    def parse(self, note):
-        note_meta = note["meta"]
+    def parse(self, html):
 
-        self.title = note_meta["name"]
+        log.debug("BEGIN parsing")
 
-        log.debug("parsing note - %s :: %s", self.title, note_meta["id"])
+        soup = BeautifulSoup(html, "html.parser")
+        self.process(soup)
 
-        # Apple Notes exports pretty basic HTML...
-        # there is no html, head or body wrapper.
+        log.debug("END parsing")
 
-        soup = BeautifulSoup(note["body"], "html.parser")
-
-        for elem in soup.children:
-            self.parse_elem(elem)
-
-        if note["attachments"]:
-            self.import_files(note["attachments"])
-
-        if self.include_meta or self.include_html:
-            self.append_divider()
-
-        if self.include_meta:
-            log.debug("adding metadata to page...")
-            meta_text = yaml.dump(note_meta).strip()
-            self.append_code(meta_text, language="yaml")
-
-        if self.include_html:
-            log.debug("appending raw HTML...")
-            self.append_code(note["body"], language="html")
-
-        log.debug("finished construction - %s", note_meta["id"])
-
-        return True
-
-    def import_files(self, attachments):
-        log.debug("processing attachments...")
-
-        self.append_divider()
-
-        for attachment in attachments:
-            log.debug("attachment[%s] => %s", attachment["id"], attachment["name"])
-
-            # FIXME until we figure out how to upload attachments, we write metadata
-            # to help track them down...  eventually this is only if self.include_meta
-            meta_text = yaml.dump(attachment).strip()
-            self.append_code(meta_text, language="yaml")
-
-    def append_text(self, text, parent=None):
-        if text is None or len(text) == 0:
-            return
+    def append(self, block, parent=None):
 
         if parent is None:
-            parent = self.content
+            parent = self.page
+
+        self.session.blocks.children.append(parent, block)
+
+        return block
+
+    def append_text(self, text, parent=None):
+        if text is None:
+            return
+
+        text = text.strip()
+
+        if len(text) == 0:
+            return
 
         log.debug('adding text: "%s..."', text[:7])
 
         block = blocks.Paragraph.from_text(text)
 
-        parent.append(block)
-
-        return block
+        return self.append(block, parent)
 
     def append_code(self, text, language=None, parent=None):
         if text is None or len(text) == 0:
             return
-
-        if parent is None:
-            parent = self.content
 
         log.debug('adding code block: "%s..." [%s]', text[:7], language)
 
@@ -162,76 +124,26 @@ class DocumentParser(object):
         if language:
             block.code.language = language
 
-        self.content.append(block)
-
-        return block
+        return self.append(block, parent)
 
     def append_divider(self, parent=None):
-        if parent is None:
-            parent = self.content
-
         log.debug('adding divider')
 
         block = blocks.Divider()
 
-        parent.append(block)
+        return self.append(block, parent)
 
-        return block
-
-    def append_li(self, text, parent, list_type):
-        if parent is None:
-            parent = self.content
-
-        log.debug('adding list item: "%s..."', text[:7])
-
-        item = list_type.from_text(text)
-
-        parent.append(item)
-
-        return item
-
-    def parse_elem(self, elem, parent=None):
-        if elem is None:
-            return None
+    def process(self, elem, parent=None):
+        log.debug("processing element - %s", elem.name)
 
         if parent is None:
-            parent = self.content
-
-        log.debug("processing block - %s", elem.name)
-
-        leftover_text = None
-
-        # skip the first line (assuming it is the title)
-        if self._first_block:
-            self._first_block = False
-            log.debug("skipping first element")
-
-        elif hasattr(self, f"parse_{elem.name}"):
-            log.debug("parser func -- parse_%s", elem.name)
-            pfunc = getattr(self, f"parse_{elem.name}")
-            pfunc(elem, parent)
-
-        # track text from remaining blocks
-        else:
-            leftover_text = get_block_text(elem)
-
-        return leftover_text
-
-    def parse_br(self, elem, parent):
-        log.debug("skipping element -- %s", elem.name)
-
-    def parse_meta(self, elem, parent):
-        log.debug("skipping element -- %s", elem.name)
-
-    def parse_div(self, elem, parent):
-        if parent is None:
-            parent = self.content
+           parent = self.page
 
         # collect text from unmapped blocks
         pending_text = list()
 
         for child in elem.children:
-            text = self.parse_elem(child)
+            text = self.parse_elem(child, parent)
 
             if text is not None and len(text) > 0:
                 log.debug('leftover text: "%s..."', text[:7])
@@ -243,28 +155,69 @@ class DocumentParser(object):
             text = "".join(pending_text)
             self.append_text(text, parent)
 
+    def parse_elem(self, elem, parent=None):
+        if elem is None:
+            return None
+
+        log.debug("parsing block - %s", elem.name)
+
+        # skip the first line (assuming it is the title)
+        if self._first_block:
+            self._first_block = False
+            log.debug("skipping first element")
+            return None
+
+        # handle known blocks 
+        elif hasattr(self, f"parse_{elem.name}"):
+            log.debug("parser func -- parse_%s", elem.name)
+            pfunc = getattr(self, f"parse_{elem.name}")
+            pfunc(elem, parent)
+            return None
+
+        # return as much text as we can from unrecognized blocks
+        return get_block_text(elem)
+
+    def parse_br(self, elem, parent):
+        # skip <br> tags - empty line break
+        log.debug("skipping element -- %s", elem.name)
+
+    def parse_meta(self, elem, parent):
+        # skip <meta> tags
+        log.debug("skipping element -- %s", elem.name)
+
+    def parse_div(self, elem, parent):
+        # <div> is just a container...  descend and resume processing
+        self.process(elem, parent)
+
+    def parse_object(self, elem, parent):
+        # <object> is just a container...  descend and resume processing
+        self.process(elem, parent)
+
     def parse_h1(self, elem, parent):
         text = get_block_text(elem)
         block = blocks.Heading1.from_text(text)
-        parent.append(block)
+        self.append(block, parent)
 
     def parse_h2(self, elem, parent):
         text = get_block_text(elem)
         block = blocks.Heading2.from_text(text)
-        parent.append(block)
+        self.append(block, parent)
 
     def parse_h3(self, elem, parent):
         text = get_block_text(elem)
         block = blocks.Heading3.from_text(text)
-        parent.append(block)
+        self.append(block, parent)
 
     def parse_list(self, elem, parent, list_type):
         item = None
 
         for child in elem.children:
+
             if child.name == "li":
                 text = get_block_text(child)
-                item = self.append_li(text, parent, list_type)
+                item = list_type.from_text(text)
+                self.append(item, parent)
+
             else:
                 self.parse_elem(child, item)
 
@@ -282,20 +235,34 @@ class DocumentParser(object):
         text = get_block_text(elem)
         self.append_code(text, parent=parent)
 
-    def parse_object(self, elem, parent):
-        log.debug("processing object")
-
-        for child in elem.children:
-            if child.name == "table":
-                self.parse_table(child, parent)
-            else:
-                log.warning("Unsupported object: %s", elem.name)
-
-    def parse_table(self, table, parent):
+    def parse_table(self, elem, parent):
         log.debug("building table")
 
-        # FIXME make an actual table...
-        self.append_code(str(table), parent=parent, language="html")
+        table = blocks.Table()
+
+        self.process(elem, parent=table)
+
+        if table.Width > 0:
+            self.append(table, parent)
+
+    def parse_thead(self, elem, parent):
+        self.process(elem, parent=parent)
+
+    def parse_tbody(self, elem, parent):
+        self.process(elem, parent=parent)
+
+    def parse_tr(self, elem, parent):
+
+        row = blocks.TableRow()
+
+        for child in elem.children:
+
+            if child.name == "td" or child.name == "th":
+                text = get_block_text(child)
+                row.append(text)
+
+        # table rows must be directly appended to the parent
+        parent.append(row)
 
     def parse_img(self, elem, parent):
         import base64
