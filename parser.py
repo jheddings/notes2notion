@@ -23,59 +23,10 @@ log = logging.getLogger(__name__)
 img_data_re = re.compile("^data:image/([^;]+);([^,]+),(.+)$")
 
 
-def markup_text(tag, text):
-
-    # bold text
-    if tag == "b" or tag == "strong":
-        return "**" + text + "**"
-
-    # italics
-    elif tag == "i" or tag == "em":
-        return "*" + text + "*"
-
-    # strike-through text
-    elif tag == "strike":
-        return "~~" + text + "~~"
-
-    # standard links
-    elif tag == "a":
-        return "<" + text + ">"
-
-    # underline - not supported in markdown
-    # elif tag == 'u':
-
-    return text
-
-
 def get_block_text(block):
-
-    # no-name blocks are just strings...
-    if block.name is None:
-        return str(block)
-
-    # otherwise, iterate over the text in the child elements
-
-    # we could use this method to do additional processing on the text
-    # e.g. we could look for things that look like URL's and make links
-    # e.g. we could look for lines that start with '-' and make lists
-
-    strings = list()
-
-    for child in block.children:
-        string = get_block_text(child)
-
-        if string is None:
-            continue
-        if len(string) == 0:
-            continue
-
-        strings.append(string.strip())
-
-    # FIXME need to return list of RichTextObject's
-
-    text = " ".join(strings)
-    markup = markup_text(block.name, text)
-    return markup.strip()
+    # TODO return as a list of RichTextObjects
+    text = " ".join(block.strings)
+    return text.strip() or None
 
 
 class DocumentParser(object):
@@ -95,6 +46,8 @@ class DocumentParser(object):
         log.debug("END parsing")
 
     def append(self, block, parent=None):
+        if block is None:
+            return
 
         if parent is None:
             parent = self.page
@@ -103,42 +56,28 @@ class DocumentParser(object):
 
         return block
 
-    def append_text(self, text, parent=None):
-        if text is None:
-            return
-
-        text = text.strip()
-
-        if len(text) == 0:
-            return
-
-        log.debug('adding text: "%s..."', text[:7])
-
-        block = blocks.Paragraph.from_text(text)
-
-        return self.append(block, parent)
-
     def process(self, elem, parent=None):
         log.debug("processing element - %s", elem.name)
 
         if parent is None:
             parent = self.page
 
-        # collect text from unmapped blocks
+        # collect text from unknown blocks
         pending_text = list()
 
         for child in elem.children:
             text = self.parse_elem(child, parent)
 
-            if text is not None and len(text) > 0:
+            if text is not None:
                 log.debug('leftover text: "%s..."', text[:7])
                 pending_text.append(text)
 
         # deal with leftover text (if we found any)
         log.debug("block complete; %d pending block(s)", len(pending_text))
         if len(pending_text) > 0:
-            text = "".join(pending_text)
-            self.append_text(text, parent)
+            text = " ".join(pending_text)
+            block = blocks.Paragraph.from_text(text)
+            self.append(block, parent)
 
     def parse_elem(self, elem, parent=None):
         if elem is None:
@@ -146,34 +85,57 @@ class DocumentParser(object):
 
         log.debug("parsing block - %s", elem.name)
 
+        leftover_text = None
+
         # skip the first line (assuming it is the title)
         if self._first_block:
             self._first_block = False
             log.debug("skipping first element")
-            return None
 
         # handle known blocks
         elif hasattr(self, f"parse_{elem.name}"):
             log.debug("parser func -- parse_%s", elem.name)
             pfunc = getattr(self, f"parse_{elem.name}")
-            pfunc(elem, parent)
-            return None
 
-        # return as much text as we can from unrecognized blocks
-        return get_block_text(elem)
+            try:
+                pfunc(elem, parent)
+            except Exception as err:
+                log.warn(err)
+
+        # capture as much text as we can from unrecognized blocks
+        else:
+            leftover_text = get_block_text(elem)
+
+        return leftover_text
 
     def parse_br(self, elem, parent):
-        log.debug("skipping element -- %s", elem.name)
+        pass
+
+    def parse_hr(self, elem, parent):
+        block = blocks.Divider()
+        self.append(block, parent)
 
     def parse_meta(self, elem, parent):
-        log.debug("skipping element -- %s", elem.name)
+        pass
+
+    def parse_html(self, elem, parent):
+        self.process(elem, parent)
+
+    def parse_head(self, elem, parent):
+        pass
+
+    def parse_body(self, elem, parent):
+        self.process(elem, parent)
+
+    def parse_iframe(self, elem, parent):
+        src = elem.get("src")
+        block = blocks.Embed.from_url(src)
+        self.append(block, parent)
 
     def parse_div(self, elem, parent):
-        # <div> is just a container...  descend and resume processing
         self.process(elem, parent)
 
     def parse_object(self, elem, parent):
-        # <object> is just a container...  descend and resume processing
         self.process(elem, parent)
 
     def parse_h1(self, elem, parent):
@@ -191,6 +153,11 @@ class DocumentParser(object):
         block = blocks.Heading3.from_text(text)
         self.append(block, parent)
 
+    def parse_p(self, elem, parent):
+        text = get_block_text(elem)
+        block = blocks.Paragraph.from_text(text)
+        self.append(block, parent)
+
     def parse_list(self, elem, parent, list_type):
         item = None
 
@@ -201,8 +168,10 @@ class DocumentParser(object):
 
             if child.name == "li":
                 text = get_block_text(child)
-                item = list_type.from_text(text)
-                self.append(item, parent)
+
+                if text is not None:
+                    item = list_type.from_text(text)
+                    self.append(item, parent)
 
             else:
                 self.parse_elem(child, item)
@@ -213,10 +182,17 @@ class DocumentParser(object):
     def parse_ol(self, elem, parent):
         self.parse_list(elem, parent, blocks.NumberedListItem)
 
+    # def parse_dl(self, elem, parent):
+    # def parse_dd(self, elem, parent):
+    # def parse_dt(self, elem, parent):
+
     def parse_script(self, elem, parent):
-        self.parse_tt(elem, parent=parent)
+        self.parse_pre(elem, parent=parent)
 
     def parse_tt(self, elem, parent):
+        self.parse_pre(elem, parent=parent)
+
+    def parse_pre(self, elem, parent):
         text = get_block_text(elem)
         block = blocks.Code.from_text(text)
         self.append(block, parent)
@@ -242,18 +218,22 @@ class DocumentParser(object):
     def parse_tbody(self, elem, parent):
         self.process(elem, parent=parent)
 
+    def parse_tfoot(self, elem, parent):
+        self.process(elem, parent=parent)
+
     def parse_tr(self, elem, parent):
-
+        # table rows must be directly appended to the table
         row = blocks.TableRow()
-
-        for child in elem.children:
-
-            if child.name == "td" or child.name == "th":
-                text = get_block_text(child)
-                row.append(text)
-
-        # table rows must be directly appended to the parent
+        self.process(elem, parent=row)
         parent.append(row)
+
+    def parse_th(self, elem, parent):
+        self.parse_td(elem, parent)
+
+    def parse_td(self, elem, parent):
+        # table data must be directly appended to the row
+        text = get_block_text(elem)
+        parent.append(text or "")
 
     def parse_img(self, elem, parent):
         import base64

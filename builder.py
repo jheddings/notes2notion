@@ -133,17 +133,12 @@ class PageBuilder(object):
             self.append_code(meta_text, pdoc, language="yaml")
 
     def append_divider(self, pdoc):
-        log.debug("adding divider")
-
         block = blocks.Divider()
-
         return pdoc.append(block)
 
     def append_code(self, text, pdoc, language=None):
-        if text is None or len(text) == 0:
+        if text is None:
             return
-
-        log.debug('adding code block: "%s..." [%s]', text[:7], language)
 
         block = blocks.Code.from_text(text)
 
