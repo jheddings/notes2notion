@@ -1,7 +1,10 @@
 __pycache__/
 *.py[cod]
 
+*.log
+
 .venv
-.vscode
+
+local.yaml
 
 *.egg-info/
