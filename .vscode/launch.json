@@ -9,7 +9,7 @@
             "justMyCode": true,
             "args": [
                 "--config",
-                "${workspaceFolder}/local"
+                "${workspaceFolder}/local.yaml"
             ]
         }
     ]
