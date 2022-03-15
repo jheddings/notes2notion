@@ -98,7 +98,8 @@ class PageBuilder(object):
 
         pdoc = DocumentParser(self.session, page)
 
-        pdoc.parse(note["body"])
+        # TODO create the page all at once...
+        page = pdoc.parse(note["body"])
 
         if note["attachments"]:
             self.import_files(pdoc, note["attachments"])
