@@ -10,10 +10,7 @@ import re
 
 import yaml
 
-try:
-    from yaml import CLoader as YamlLoader
-except ImportError:
-    from yaml import Loader as YamlLoader
+log = logging.getLogger(__name__)
 
 
 def tell_app(app, *args):
@@ -46,7 +43,7 @@ def tell_notes(*args):
 
 class Notes(object):
     def __init__(self):
-        self.logger = logging.getLogger("notes2notion.apple.Notes")
+        self.logger = log.getChild("Notes")
 
     def __iter__(self):
         note_ids = self.get_all_ids()
@@ -141,11 +138,7 @@ class Notes(object):
         # adjust the metadata to account for `quoted form of`
         text_meta = text_meta.replace("'\\''", "''")
 
-        try:
-            note = yaml.load(text_meta, Loader=YamlLoader)
-        except yaml.YAMLError as e:
-            self.logger.error("YAMLError - %s", e)
-            return None
+        note = yaml.full_load(text_meta)
 
         note["body"] = text_body.strip()
         self.logger.debug("loaded note - %s", note["meta"]["name"])
@@ -163,7 +156,7 @@ class Notes(object):
             self.note_ids = note_ids
             self.iter_idx = 0
             self.outer = outer
-            self.logger = logging.getLogger("notes2notion.apple.Notes.Iterator")
+            self.logger = log.getChild("Notes.Iterator")
 
         def __next__(self):
             self.logger.debug("load next note - cursor: %d", self.iter_idx)

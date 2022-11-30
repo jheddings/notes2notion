@@ -1,7 +1,0 @@
-applescript==2021.2.9
-notional==0.1.2
-beautifulsoup4==4.10.0
-PyYAML==6.0
-isort==5.10.1
-black==22.1.0
-flake8==4.0.1

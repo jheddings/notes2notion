@@ -5,15 +5,12 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-# XXX with a little work, this could be a more general-purpose HTML parser for Notion
-# perhaps we could pull out the document parser and include it with Notional?
-
 import logging
 import re
-from parser import DocumentParser
 
-import yaml
 from notional import blocks
+from notional.parser import HtmlParser
+import yaml
 
 log = logging.getLogger(__name__)
 
@@ -21,66 +18,11 @@ log = logging.getLogger(__name__)
 img_data_re = re.compile("^data:image/([^;]+);([^,]+),(.+)$")
 
 
-def markup_text(tag, text):
-
-    # bold text
-    if tag == "b" or tag == "strong":
-        return "**" + text + "**"
-
-    # italics
-    elif tag == "i" or tag == "em":
-        return "*" + text + "*"
-
-    # strike-through text
-    elif tag == "strike":
-        return "~~" + text + "~~"
-
-    # standard links
-    elif tag == "a":
-        return "<" + text + ">"
-
-    # underline - not supported in markdown
-    # elif tag == 'u':
-
-    return text
-
-
-def get_block_text(block):
-
-    # no-name blocks are just strings...
-    if block.name is None:
-        return str(block)
-
-    # otherwise, iterate over the text in the child elements
-
-    # we could use this method to do additional processing on the text
-    # e.g. we could look for things that look like URL's and make links
-    # e.g. we could look for lines that start with '-' and make lists
-
-    strings = list()
-
-    for child in block.children:
-        string = get_block_text(child)
-
-        if string is None:
-            continue
-        if len(string) == 0:
-            continue
-
-        strings.append(string.strip())
-
-    # FIXME need to return list of RichTextObject's
-
-    text = " ".join(strings)
-    markup = markup_text(block.name, text)
-    return markup.strip()
-
-
 class PageBuilder(object):
 
     # TODO make configurable
     include_meta: bool = True
-    include_html: bool = True
+    include_html: bool = False
 
     def __init__(self, session, parent):
         self.session = session
@@ -91,39 +33,39 @@ class PageBuilder(object):
 
         log.debug("parsing note - %s :: %s", note_meta["name"], note_meta["id"])
 
+        parser = HtmlParser()
+
+        parser.parse(note["body"])
+
         page = self.session.pages.create(
             parent=self.parent,
             title=note_meta["name"],
+            children=parser.content,
         )
 
-        pdoc = DocumentParser(self.session, page)
-
-        # TODO create the page all at once...
-        page = pdoc.parse(note["body"])
-
         if note["attachments"]:
-            self.import_files(pdoc, note["attachments"])
+            self.import_files(page, note["attachments"])
 
         if self.include_meta or self.include_html:
-            self.append_divider(pdoc)
+            self.append_divider(page)
 
         if self.include_meta:
             log.debug("adding metadata to page...")
             meta_text = yaml.dump(note_meta).strip()
-            self.append_code(meta_text, pdoc, language="yaml")
+            self.append_code(meta_text, page, language="yaml")
 
         if self.include_html:
             log.debug("appending raw HTML...")
-            self.append_code(note["body"], pdoc, language="html")
+            self.append_code(note["body"], page, language="html")
 
         log.debug("finished construction - %s", note_meta["id"])
 
         return page
 
-    def import_files(self, pdoc, attachments):
+    def import_files(self, page, attachments):
         log.debug("processing attachments...")
 
-        self.append_divider(pdoc)
+        self.append_divider(page)
 
         for attachment in attachments:
             log.debug("attachment[%s] => %s", attachment["id"], attachment["name"])
@@ -131,19 +73,19 @@ class PageBuilder(object):
             # FIXME until we figure out how to upload attachments, we write metadata
             # to help track them down...  eventually this is only if self.include_meta
             meta_text = yaml.dump(attachment).strip()
-            self.append_code(meta_text, pdoc, language="yaml")
+            self.append_code(meta_text, page, language="yaml")
 
-    def append_divider(self, pdoc):
+    def append_divider(self, page):
         block = blocks.Divider()
-        return pdoc.append(block)
+        self.session.blocks.children.append(page, block)
 
-    def append_code(self, text, pdoc, language=None):
+    def append_code(self, text, page, language=None):
         if text is None:
             return
 
-        block = blocks.Code.from_text(text)
+        block = blocks.Code[text]
 
         if language:
             block.code.language = language
 
-        return pdoc.append(block)
+        self.session.blocks.children.append(page, block)

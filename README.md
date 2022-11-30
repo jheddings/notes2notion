@@ -10,23 +10,26 @@ to ensure that your valuable data is protected!
 
 # Requirements
 
-The script requires `python3`.  The easiest way to install on macOS is using
+The script requires `python3` and `poetry`.  The easiest way to install on macOS is using
 [Homebrew](https://brew.sh):
 
 ```bash
-brew install python3
+brew install python3 poetry
 ```
 
 ## Dependencies
 
-You will also need to install the dependencies using `pip`:
+This application uses `poetry` to manage dependencies.  This protects your local
+environment and makes running the application more reliable.
+
+To initialize the environment, simply run:
 
 ```bash
-python3 -m pip install -r requirements.txt
+poetry install
 ```
 
-For advanced users, you may want to do this in a virtual environment to avoid
-conflicts with your system modules.
+At any time, you may re-run this command to get the latest supported version of all
+dependencies.
 
 # Usage
 
@@ -44,7 +47,7 @@ content.  Check the configuration document in the script for more details.
 Run the script, as shown:
 
 ```bash
-python3 main.py --config notes2notion.yaml
+poetry run python main.py --config notes2notion.yaml
 ```
 
 You will see the script print the name of each note as it is processed.

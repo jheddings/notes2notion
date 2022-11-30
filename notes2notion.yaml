@@ -34,6 +34,10 @@ logging:
     level: INFO
     handlers: [console]
 
+  loggers:
+    notional:
+      level: WARN
+
   handlers:
     console:
       class: logging.StreamHandler

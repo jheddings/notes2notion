@@ -9,64 +9,22 @@
 
 import logging
 import os
+import sys
 
 import notional
 
+# setup logging before importing our modules
+from config import AppConfig
 
-def parse_args():
-    import argparse
-
-    argp = argparse.ArgumentParser()
-
-    argp.add_argument(
-        "--config",
-        default="./notes2notion.yaml",
-        help="configuration file (default: ./notes2notion.yaml)",
-    )
-
-    return argp.parse_args()
-
-
-def load_config(config_file):
-    import logging.config
-
-    import yaml
-
-    try:
-        from yaml import CLoader as YamlLoader
-    except ImportError:
-        from yaml import Loader as YamlLoader
-
-    if not os.path.exists(config_file):
-        print(f"ERROR: config file does not exist: {config_file}")
-        return None
-
-    with open(config_file, "r") as fp:
-        conf = yaml.load(fp, Loader=YamlLoader)
-
-        # determine if logging is already configured...
-        root_logger = logging.getLogger()
-        if not root_logger.hasHandlers():
-            if "logging" in conf:
-                logging.config.dictConfig(conf["logging"])
-            else:
-                logging.basicConfig(level=logging.WARN)
-
-    return conf
-
-
-################################################################################
-## MAIN ENTRY
-
-args = parse_args()
-conf = load_config(args.config)
-log = logging.getLogger(__name__)
+conf = AppConfig.load(sys.argv[1])
 
 import apple
 from builder import PageBuilder
 
-session = notional.connect(auth=conf["auth_token"])
-archive = session.pages.retrieve(conf["import_page_id"])
+log = logging.getLogger(__name__)
+
+session = notional.connect(auth=conf.auth_token)
+archive = session.pages.retrieve(conf.import_page_id)
 builder = PageBuilder(session, archive)
 
 for note in apple.Notes():
@@ -89,7 +47,11 @@ for note in apple.Notes():
     log.debug("creating page - %s", note_name)
 
     # build the note in-place on the archive page
-    page = builder.build(note)
+    try:
+        page = builder.build(note)
+    except Exception as err:
+        log.error(err)
+        continue
 
     log.debug("processing complete - %s", note_name)
     log.info(":: %s => %s", page.Title, page.url)
