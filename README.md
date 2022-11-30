@@ -53,26 +53,12 @@ You will see the script print the name of each note as it is processed.
 # Limitations
 
 Apple Notes only exports a limited set of the formatting from the original note.
-Specifically, many colors, font sizes, font styles, etc are not preserved.
 
-Underline is not preserved due to a limitation in Markdown.
-
-Hyperlinks are not preserved, since they are not exported from Apple Notes.
+- Many colors, font sizes, font styles, etc are not preserved.
+- Underline is not preserved due to a limitation in Markdown.
+- Hyperlinks are not preserved, due to a limitation in Apple Notes.
 
 # Known Issues
 
-Formatting (such as bold, color, etc) and tables are not fully supported.
-
-Attachements (like pictures and scanned documents) are not currently supported.  The
-official API does not have an "upload" method at this time.
-
-The script is VERY slow.  This is due to the way blocks are built using the
-[notion-py](https://github.com/jamalex/notion-py) client.  Essentially, each "block"
-in the source note is reconstructed on the server one-by-one.  I'm sure there are ways
-to improve this, I just haven't taken the time to do so.
-
-Some characters in title blocks (especially quotes) or styling can cause odd behavior
-in the note body.
-
-Please report any `yaml.parser.ParserError` errors.  These are caused by unexpected
-characters in the note title or other metadata.
+See [Issues](https://github.com/jheddings/notes2notion/issues) to review current bugs or
+report new issues.
