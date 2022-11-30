@@ -56,7 +56,7 @@ Apple Notes only exports a limited set of the formatting from the original note.
 
 - Many colors, font sizes, font styles, etc are not preserved.
 - Underline is not preserved due to a limitation in Markdown.
-- Hyperlinks are not preserved, due to a limitation in Apple Notes.
+- Hyperlinks are not preserved during Apple Notes export.
 
 # Known Issues
 
