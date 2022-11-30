@@ -8,8 +8,8 @@
 import os
 from typing import Dict, Optional
 
-from pydantic import BaseModel, root_validator, validator
 import yaml
+from pydantic import BaseModel, root_validator
 
 
 class AppConfig(BaseModel):

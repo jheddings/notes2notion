@@ -122,9 +122,6 @@ class Notes(object):
             "end repeat",
         )
 
-        # DEBUG - print raw text output from AppleScript
-        # print(text)
-
         # bail if nothing came out...
         if text is None:
             self.logger.debug("Note is empty: %s", note_id)
@@ -142,9 +139,6 @@ class Notes(object):
 
         note["body"] = text_body.strip()
         self.logger.debug("loaded note - %s", note["meta"]["name"])
-
-        # DEBUG - print yaml structure from parsed note
-        # print(yaml.dump(note))
 
         return note
 

@@ -8,9 +8,9 @@
 import logging
 import re
 
+import yaml
 from notional import blocks
 from notional.parser import HtmlParser
-import yaml
 
 log = logging.getLogger(__name__)
 

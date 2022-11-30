@@ -8,7 +8,6 @@
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import logging
-import os
 import sys
 
 import notional
@@ -49,8 +48,8 @@ for note in apple.Notes():
     # build the note in-place on the archive page
     try:
         page = builder.build(note)
-    except Exception as err:
-        log.error(err)
+    except Exception:
+        log.exception("An exception occurred while processing '%s'", note_name)
         continue
 
     log.debug("processing complete - %s", note_name)
