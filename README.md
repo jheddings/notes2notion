@@ -1,9 +1,7 @@
 # notes2notion
 
-> :warning: **Work In Progress**: This script is being ported to the official Notion API.
-Some features may be broken or incomplete until they are officially supported.
-
-This is a basic script that will import from Apple Notes directly into Notion.
+This is a basic script that will import from Apple Notes directly into Notion.  Note that
+data extraction from Apple Notes is very limited.  See Limitations below.
 
 When working with your data, always make a backup and/or perform testing in a safe area
 to ensure that your valuable data is protected!
@@ -47,7 +45,7 @@ content.  Check the configuration document in the script for more details.
 Run the script, as shown:
 
 ```bash
-poetry run python main.py --config notes2notion.yaml
+poetry run python main.py notes2notion.yaml
 ```
 
 You will see the script print the name of each note as it is processed.
