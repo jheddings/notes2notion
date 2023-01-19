@@ -368,14 +368,14 @@ httpx = ">=0.15.0"
 
 [[package]]
 name = "notional"
-version = "0.5.0"
+version = "0.7.0"
 description = "A high-level interface for the Notion SDK."
 category = "main"
 optional = false
 python-versions = ">=3.8.1,<4.0.0"
 files = [
-    {file = "notional-0.5.0-py3-none-any.whl", hash = "sha256:ce2253b75d75723f01cf593dcd0815161135ca8ce66c41c22a9def9ec2174669"},
-    {file = "notional-0.5.0.tar.gz", hash = "sha256:f664409b462e7e95d1d9412874451b76a04f502aec4f2981a4b93585cdd37b00"},
+    {file = "notional-0.7.0-py3-none-any.whl", hash = "sha256:3dab9ce71579caf93269fc795826c2f3ed7b63cc5b497df50478ee615ea4b5e2"},
+    {file = "notional-0.7.0.tar.gz", hash = "sha256:ea3c1bfec3c18495b273ead8740e22b517b06b4bc462c35ad359462785f82f2e"},
 ]
 
 [package.dependencies]
@@ -708,4 +708,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "b0fdcd65a62be1cde997986d81c59af0bbc02707d879a052cac3f0e4b3c4600d"
+content-hash = "0f1ab14d7b21e34f2aebb13facab3451692d9aadcc9a204860aca6e00e8995d7"
