@@ -1,6 +1,6 @@
 # configuration file for notes2notion
 
-# set this to your current token_v2 cookie (use an inspector in your browser to obtain)
+# set this to your integration token
 auth_token: NOTION_AUTH_TOKEN
 
 # set this to the top-level page for the import - all notes will be added as sub pages
