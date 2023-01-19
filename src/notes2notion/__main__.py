@@ -33,7 +33,7 @@ class MainApp:
 
             # skip empty notes
             if note is None:
-                logger.warning("empty note; skipping")
+                self.logger.warning("empty note; skipping")
                 continue
 
             note_meta = note["meta"]
@@ -41,24 +41,24 @@ class MainApp:
 
             # skip locked notes - they are just empty
             if note_meta["locked"]:
-                logger.warning("LOCKED - %s", note_name)
+                self.logger.warning("LOCKED - %s", note_name)
                 continue
 
-            logger.info("Processing - %s", note_name)
+            self.logger.info("Processing - %s", note_name)
 
-            logger.debug("creating page - %s", note_name)
+            self.logger.debug("creating page - %s", note_name)
 
             # build the note in-place on the archive page
             try:
                 page = builder.build(note)
             except Exception:
-                logger.exception(
+                self.logger.exception(
                     "An exception occurred while processing '%s'", note_name
                 )
                 continue
 
-            logger.debug("processing complete - %s", note_name)
-            logger.info(":: %s => %s", page.Title, page.url)
+            self.logger.debug("processing complete - %s", note_name)
+            self.logger.info(":: %s => %s", page.Title, page.url)
 
 
 @click.command()

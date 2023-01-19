@@ -7,7 +7,7 @@ import yaml
 from notional import blocks
 from notional.parser import HtmlParser
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 # parse embedded image data
 img_data_re = re.compile("^data:image/([^;]+);([^,]+),(.+)$")
@@ -22,11 +22,12 @@ class PageBuilder(object):
     def __init__(self, session, parent):
         self.session = session
         self.parent = parent
+        self.logger = logger.getChild("PageBuilder")
 
     def build(self, note):
         note_meta = note["meta"]
 
-        log.debug("parsing note - %s :: %s", note_meta["name"], note_meta["id"])
+        self.logger.debug("parsing note - %s :: %s", note_meta["name"], note_meta["id"])
 
         parser = HtmlParser()
 
@@ -45,25 +46,27 @@ class PageBuilder(object):
             self.append_divider(page)
 
         if self.include_meta:
-            log.debug("adding metadata to page...")
+            self.logger.debug("adding metadata to page...")
             meta_text = yaml.dump(note_meta).strip()
             self.append_code(meta_text, page, language="yaml")
 
         if self.include_html:
-            log.debug("appending raw HTML...")
+            self.logger.debug("appending raw HTML...")
             self.append_code(note["body"], page, language="html")
 
-        log.debug("finished construction - %s", note_meta["id"])
+        self.logger.debug("finished construction - %s", note_meta["id"])
 
         return page
 
     def import_files(self, page, attachments):
-        log.debug("processing attachments...")
+        self.logger.debug("processing attachments...")
 
         self.append_divider(page)
 
         for attachment in attachments:
-            log.debug("attachment[%s] => %s", attachment["id"], attachment["name"])
+            self.logger.debug(
+                "attachment[%s] => %s", attachment["id"], attachment["name"]
+            )
 
             # FIXME until we figure out how to upload attachments, we write metadata
             # to help track them down...  eventually this is only if self.include_meta

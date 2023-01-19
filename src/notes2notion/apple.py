@@ -5,7 +5,7 @@ import re
 
 import yaml
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def tell_app(app, *args):
@@ -38,7 +38,7 @@ def tell_notes(*args):
 
 class Notes(object):
     def __init__(self):
-        self.logger = log.getChild("Notes")
+        self.logger = logger.getChild("Notes")
 
     def __iter__(self):
         note_ids = self.get_all_ids()
@@ -145,7 +145,7 @@ class Notes(object):
             self.note_ids = note_ids
             self.iter_idx = 0
             self.outer = outer
-            self.logger = log.getChild("Notes.Iterator")
+            self.logger = logger.getChild("Notes.Iterator")
 
         def __next__(self):
             self.logger.debug("load next note - cursor: %d", self.iter_idx)
