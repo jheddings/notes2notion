@@ -18,7 +18,7 @@ pyyaml = "^6.0"
 isort = "^5.10.1"
 black = "^22.10.0"
 flake8 = "^6.0.0"
-pre-commit = "^2.20.0"
+pre-commit = "^3.0.0"
 
 [build-system]
 requires = ["poetry-core"]
