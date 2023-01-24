@@ -20,6 +20,9 @@ black = "^22.10.0"
 flake8 = "^6.0.0"
 pre-commit = "^3.0.0"
 
+[tool.poetry.scripts]
+notes2notion = "notes2notion.__main__:main"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
