@@ -7,7 +7,7 @@ auth_token: NOTION_AUTH_TOKEN
 import_page_id: ARCHIVE_PAGE_ID
 
 # by default, this script will skip the first Title line in the note
-# FIXME this config parameter is not currently working
+# FIXME this config parameter is not currently working (#11)
 skip_title: True
 
 # include raw note metadata in the Notion import
