@@ -1,16 +1,11 @@
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-# PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+"""Manage Apple Notes."""
 
 import logging
 import re
 
 import yaml
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def tell_app(app, *args):
@@ -43,7 +38,7 @@ def tell_notes(*args):
 
 class Notes(object):
     def __init__(self):
-        self.logger = log.getChild("Notes")
+        self.logger = logger.getChild("Notes")
 
     def __iter__(self):
         note_ids = self.get_all_ids()
@@ -150,7 +145,7 @@ class Notes(object):
             self.note_ids = note_ids
             self.iter_idx = 0
             self.outer = outer
-            self.logger = log.getChild("Notes.Iterator")
+            self.logger = logger.getChild("Notes.Iterator")
 
         def __next__(self):
             self.logger.debug("load next note - cursor: %d", self.iter_idx)

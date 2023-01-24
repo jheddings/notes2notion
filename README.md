@@ -1,15 +1,15 @@
 # notes2notion
 
-This is a basic script that will import from Apple Notes directly into Notion.  Note that
+This script will import from Apple Notes directly into Notion.  Note that
 data extraction from Apple Notes is very limited.  See Limitations below.
 
-When working with your data, always make a backup and/or perform testing in a safe area
-to ensure that your valuable data is protected!
+When working with your data, always make a backup and/or perform testing
+in a safe area to ensure that your valuable data is protected!
 
 # Requirements
 
-The script requires `python3` and `poetry`.  The easiest way to install on macOS is using
-[Homebrew](https://brew.sh):
+The script requires `python3` and `poetry`.  The easiest way to install on macOS is
+using [Homebrew](https://brew.sh):
 
 ```bash
 brew install python3 poetry
@@ -26,7 +26,7 @@ To initialize the environment, simply run:
 poetry install
 ```
 
-At any time, you may re-run this command to get the latest supported version of all
+At any time, you may re-run he above command to get the latest supported version of all
 dependencies.
 
 # Usage
@@ -45,7 +45,7 @@ content.  Check the configuration document in the script for more details.
 Run the script, as shown:
 
 ```bash
-poetry run python main.py notes2notion.yaml
+poetry run notes2notion --config=mynotes.yaml
 ```
 
 You will see the script print the name of each note as it is processed.
@@ -60,5 +60,5 @@ Apple Notes only exports a limited set of the formatting from the original note.
 
 # Known Issues
 
-See [Issues](https://github.com/jheddings/notes2notion/issues) to review current bugs or
-report new issues.
+See [Issues](https://github.com/jheddings/notes2notion/issues) to review current bugs
+or report new issues.
