@@ -47,10 +47,12 @@ class PageBuilder(object):
         if self.include_meta:
             self.logger.debug("adding metadata to page...")
             meta_text = yaml.dump(note_meta).strip()
+            self.append_h1(page, "Source Metadata")
             self.append_code(meta_text, page, language="yaml")
 
         if self.include_html:
             self.logger.debug("appending raw HTML...")
+            self.append_h1(page, "Source Note Code")
             self.append_code(note["body"], page, language="html")
 
         self.logger.debug("finished construction - %s", note_meta["id"])
@@ -61,6 +63,7 @@ class PageBuilder(object):
         self.logger.debug("processing attachments...")
 
         self.append_divider(page)
+        self.append_h1(page, "Attachments")
 
         for attachment in attachments:
             self.logger.debug(
@@ -71,6 +74,10 @@ class PageBuilder(object):
             # to help track them down...  eventually this is only if self.include_meta
             meta_text = yaml.dump(attachment).strip()
             self.append_code(meta_text, page, language="yaml")
+
+    def append_h1(self, page, text):
+        block = blocks.Heading1[text]
+        self.session.blocks.children.append(page, block)
 
     def append_divider(self, page):
         block = blocks.Divider()
