@@ -1,4 +1,4 @@
-# notes2notion
+# notes2notion #
 
 This script will import from Apple Notes directly into Notion.  Note that
 data extraction from Apple Notes is very limited.  See Limitations below.
@@ -6,7 +6,7 @@ data extraction from Apple Notes is very limited.  See Limitations below.
 When working with your data, always make a backup and/or perform testing
 in a safe area to ensure that your valuable data is protected!
 
-# Requirements
+# Requirements #
 
 The script requires `python3` and `poetry`.  The easiest way to install on macOS is
 using [Homebrew](https://brew.sh):
@@ -15,7 +15,7 @@ using [Homebrew](https://brew.sh):
 brew install python3 poetry
 ```
 
-## Dependencies
+## Dependencies ##
 
 This application uses `poetry` to manage dependencies.  This protects your local
 environment and makes running the application more reliable.
@@ -23,34 +23,34 @@ environment and makes running the application more reliable.
 To initialize the environment, simply run:
 
 ```bash
-poetry install
+poetry install --sync
 ```
 
 At any time, you may re-run he above command to get the latest supported version of all
 dependencies.
 
-# Usage
+# Usage #
 
-You will need to edit the default configuration file.  Specifically, you need to set
-up an integration for your Notion workspace and set the `auth_token` property.  In
-addtion, you will need to provide the ID or URL of the top-level archive page where
-notes will be imported.  This page must be shared with your integration token.
+You will need an integration for your Notion workspace.  This can be set either using
+the command line or by setting the environment variable `NOTION_ACCESS_TOKEN`.  Be sure
+that your target import page is shared with your integration.
 
 For more information on setting up the workspace integration, visit the official
 [Authorization Guide](https://developers.notion.com/docs/authorization).
 
-There are several other configuration options that control how the script handles note
-content.  Check the configuration document in the script for more details.
-
-Run the script, as shown:
+Run the script to get a list of configuration options:
 
 ```bash
-poetry run notes2notion --config=mynotes.yaml
+poetry run notes2notion --help
 ```
 
-You will see the script print the name of each note as it is processed.
+Simply run the script with the desired options when ready:
 
-# Limitations
+```bash
+poetry run notes2notion --auth NOTION_ACCESS_TOKEN --page 2fac8b5571d04310bb2c695cf3d1422b
+```
+
+# Limitations #
 
 Apple Notes only exports a limited set of the formatting from the original note.
 
@@ -58,7 +58,7 @@ Apple Notes only exports a limited set of the formatting from the original note.
 - Underline is not preserved due to a limitation in Markdown.
 - Hyperlinks are not preserved during Apple Notes export.
 
-# Known Issues
+# Known Issues #
 
 See [Issues](https://github.com/jheddings/notes2notion/issues) to review current bugs
 or report new issues.
