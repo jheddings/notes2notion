@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "notes2notion"
-version = "1.0.0"
+version = "2.0.0"
 description = "Import content from Apple Notes into Notion"
 authors = ["jheddings <jheddings@gmail.com>"]
 license = "MIT"
