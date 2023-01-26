@@ -14,15 +14,14 @@ img_data_re = re.compile("^data:image/([^;]+);([^,]+),(.+)$")
 
 
 class PageBuilder(object):
-
-    # TODO make configurable
-    include_meta: bool = True
-    include_html: bool = False
-
     def __init__(self, session, parent):
         self.session = session
         self.parent = parent
         self.logger = logger.getChild("PageBuilder")
+
+        self.skip_title = True
+        self.include_meta = False
+        self.include_html = False
 
     def build(self, note):
         note_meta = note["meta"]
