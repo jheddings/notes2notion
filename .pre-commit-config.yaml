@@ -23,3 +23,8 @@ repos:
           - flake8-eradicate
           - flake8-logging-format
           - flake8-return
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
