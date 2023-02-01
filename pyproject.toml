@@ -16,7 +16,7 @@ pyyaml = "^6.0"
 
 [tool.poetry.group.dev.dependencies]
 isort = "^5.10.1"
-black = "^22.10.0"
+black = "^23.0.0"
 flake8 = "^6.0.0"
 pre-commit = "^3.0.0"
 
