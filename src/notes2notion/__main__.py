@@ -31,7 +31,6 @@ class MainApp:
         builder.include_meta = include_meta
 
         for note in apple.Notes():
-
             # skip empty notes
             if note is None:
                 self.logger.warning("empty note; skipping")
