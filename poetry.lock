@@ -373,18 +373,18 @@ httpx = ">=0.15.0"
 
 [[package]]
 name = "notional"
-version = "0.7.1"
+version = "0.7.3"
 description = "A high-level interface for the Notion SDK."
 category = "main"
 optional = false
 python-versions = ">=3.8.1,<4.0.0"
 files = [
-    {file = "notional-0.7.1-py3-none-any.whl", hash = "sha256:af398e5dc345b1d612e53f66fcf9f01193bd4cd7e37f8f0a401c89e64a9bb824"},
-    {file = "notional-0.7.1.tar.gz", hash = "sha256:a51a6a859c0fd5cbbb9b53a94b6c4886dd450ca37baf5e2d43d49bb550055aa4"},
+    {file = "notional-0.7.3-py3-none-any.whl", hash = "sha256:299c36cc66c9b4f82958adebfc2bed83c415a53c265f4714a6b7c17665a9515d"},
+    {file = "notional-0.7.3.tar.gz", hash = "sha256:ae51eefe7d3140a7c058a51c126b127214f5d43f0ddd7c63e8f4b4e69eadfec4"},
 ]
 
 [package.dependencies]
-emoji = ">=2.0,<3.0"
+emoji = ">=2.2.0,<3.0.0"
 html5lib = ">=1.1,<2.0"
 notion-client = ">=2.0.0,<3.0.0"
 pydantic = ">=1.9.1,<2.0.0"
@@ -712,4 +712,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "9f1027fe8e2bfb8f955c57d766c2638c1682540adcca5a10a68f14a3597f9b8d"
+content-hash = "a567b43d6f3cb8bbf170d79ada0fda3ad287ff4d44980a93cf068ce75bd2ece9"
