@@ -2,7 +2,6 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "enabled": true,
 
-  "assignees": ["jheddings"],
   "labels": ["dependencies", "renovate"],
 
   "python": {
@@ -12,7 +11,8 @@
 
   "pre-commit": {
     "addLabels": ["pre-commit"],
-    "enabled": true
+    "enabled": true,
+    "automerge": true
   },
 
   "lockFileMaintenance": {
