@@ -5,42 +5,42 @@
   "labels": ["dependencies", "renovate"],
 
   "python": {
-    "addLabels": ["python"],
+    "addLabels": ["dep:python"],
     "enabled": true
   },
 
   "docker": {
-    "addLabels": ["docker"],
+    "addLabels": ["dep:docker"],
     "enabled": true
   },
 
   "golang": {
-    "addLabels": ["golang"],
+    "addLabels": ["dep:golang"],
     "enabled": true
   },
 
   "rust": {
-    "addLabels": ["rust"],
+    "addLabels": ["dep:rust"],
     "enabled": true
   },
 
   "java": {
-    "addLabels": ["java"],
+    "addLabels": ["dep:java"],
     "enabled": true
   },
 
   "js": {
-    "addLabels": ["js"],
+    "addLabels": ["dep:js"],
     "enabled": true
   },
 
   "node": {
-    "addLabels": ["nodejs"],
+    "addLabels": ["dep:nodejs"],
     "enabled": true
   },
 
   "pre-commit": {
-    "addLabels": ["pre-commit"],
+    "addLabels": ["dep:pre-commit"],
     "enabled": true,
     "automerge": true
   },
