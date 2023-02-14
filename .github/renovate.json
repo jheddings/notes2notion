@@ -9,6 +9,36 @@
     "enabled": true
   },
 
+  "docker": {
+    "addLabels": ["docker"],
+    "enabled": true
+  },
+
+  "golang": {
+    "addLabels": ["golang"],
+    "enabled": true
+  },
+
+  "rust": {
+    "addLabels": ["rust"],
+    "enabled": true
+  },
+
+  "java": {
+    "addLabels": ["java"],
+    "enabled": true
+  },
+
+  "js": {
+    "addLabels": ["js"],
+    "enabled": true
+  },
+
+  "node": {
+    "addLabels": ["nodejs"],
+    "enabled": true
+  },
+
   "pre-commit": {
     "addLabels": ["pre-commit"],
     "enabled": true,
