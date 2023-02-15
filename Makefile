@@ -16,8 +16,12 @@ export
 .PHONY: venv
 
 venv:
-	poetry install --sync
+	poetry install --sync --no-interaction
 	$(WITH_VENV) pre-commit install --install-hooks --overwrite
+
+################################################################################
+poetry.lock: venv
+	poetry lock --no-update --no-interaction
 
 ################################################################################
 .PHONY: github-reltag
@@ -54,4 +58,4 @@ clean:
 
 clobber: clean
 	$(WITH_VENV) pre-commit uninstall
-	poetry env remove --all
+	poetry env remove --all --no-interaction
