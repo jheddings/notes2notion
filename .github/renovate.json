@@ -39,6 +39,11 @@
     "enabled": true
   },
 
+  "github-actions": {
+    "addLabels": ["dep:gh-actions"],
+    "enabled": true
+  },
+
   "pre-commit": {
     "addLabels": ["dep:pre-commit"],
     "enabled": true,
