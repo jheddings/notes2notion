@@ -54,4 +54,4 @@ clean:
 
 clobber: clean
 	$(WITH_VENV) pre-commit uninstall
-	rm -Rf "$(BASEDIR)/.venv"
+	poetry env remove --all
