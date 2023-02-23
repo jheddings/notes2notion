@@ -1,8 +1,7 @@
 ---
-name: Static Checks
+name: Preflight Checks
 
 "on":
-
   push:
     branches: [main]
   pull_request:
@@ -14,9 +13,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
-
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
-
-      - name: Run static checks
-        run: make static-checks
+      - uses: pre-commit/action@v3.0.0
