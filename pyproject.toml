@@ -15,7 +15,7 @@ pydantic = "^1.10.7"
 pyyaml = "^6.0"
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "^3.3.1"
+pre-commit = "^3.3.2"
 
 [tool.poetry.scripts]
 notes2notion = "notes2notion.__main__:main"
