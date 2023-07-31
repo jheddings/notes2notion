@@ -7,12 +7,12 @@ repos:
         args: [--profile, black]
 
   - repo: https://github.com/psf/black
-    rev: "23.3.0"
+    rev: "23.7.0"
     hooks:
       - id: black
 
   - repo: https://github.com/pycqa/flake8
-    rev: "6.0.0"
+    rev: "6.1.0"
     hooks:
       - id: flake8
         additional_dependencies:
@@ -24,7 +24,7 @@ repos:
           - flake8-return
 
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: "v1.30.0"
+    rev: "v1.32.0"
     hooks:
       - id: yamllint
 
