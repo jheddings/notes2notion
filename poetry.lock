@@ -299,14 +299,14 @@ test = ["appdirs (==1.4.4)", "covdefaults (>=2.3)", "pytest (>=7.3.1)", "pytest-
 
 [[package]]
 name = "pre-commit"
-version = "3.5.0"
+version = "3.6.0"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
 category = "dev"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "pre_commit-3.5.0-py2.py3-none-any.whl", hash = "sha256:841dc9aef25daba9a0238cd27984041fa0467b4199fc4852e27950664919f660"},
-    {file = "pre_commit-3.5.0.tar.gz", hash = "sha256:5804465c675b659b0862f07907f96295d490822a450c4c40e747d0b1c6ebcb32"},
+    {file = "pre_commit-3.6.0-py2.py3-none-any.whl", hash = "sha256:c255039ef399049a5544b6ce13d135caba8f2c28c3b4033277a788f434308376"},
+    {file = "pre_commit-3.6.0.tar.gz", hash = "sha256:d30bad9abf165f7785c15a21a1f46da7d0677cb00ee7ff4c579fd38922efe15d"},
 ]
 
 [package.dependencies]
@@ -535,4 +535,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11.5"
-content-hash = "e69e41fc200e34f6c44a38fde3915e68df40d03dfe582b92347f60da581d1cd0"
+content-hash = "58f8e73bed0e46f1f93257c378e3cf9632706838d28284a3bb69afc53fdc6a67"
