@@ -97,13 +97,14 @@ files = [
 
 [[package]]
 name = "emoji"
-version = "2.6.0"
+version = "2.11.0"
 description = "Emoji for Python"
 category = "main"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
 files = [
-    {file = "emoji-2.6.0.tar.gz", hash = "sha256:39ad95c9ba270cdfbd141d20c2ebcfc4e295d010b605de66908a098a3ba63a3c"},
+    {file = "emoji-2.11.0-py2.py3-none-any.whl", hash = "sha256:63fc9107f06c6c2e48e5078ce9575cef98518f5ac09474f6148a43e989989582"},
+    {file = "emoji-2.11.0.tar.gz", hash = "sha256:772eaa30f4e0b1ce95148a092df4c7dc97644532c03225326b0fd05e8a9f72a3"},
 ]
 
 [package.extras]
@@ -249,14 +250,14 @@ setuptools = "*"
 
 [[package]]
 name = "notion-client"
-version = "2.0.0"
+version = "2.2.1"
 description = "Python client for the official Notion API"
 category = "main"
 optional = false
 python-versions = ">=3.7, <4"
 files = [
-    {file = "notion-client-2.0.0.tar.gz", hash = "sha256:c87ad58ad58085c4a1a619b61f9634c4b12c2b3af18e9cac78c32cebaa2046dd"},
-    {file = "notion_client-2.0.0-py2.py3-none-any.whl", hash = "sha256:793fc0fd3e6cb61a4b386349bf314583a7d2713e5ee9586c9391feeb20a3b2f2"},
+    {file = "notion-client-2.2.1.tar.gz", hash = "sha256:3827e381ccb5a21aeb606686787edfb6c7a10681cb3507c4d606a1918e791061"},
+    {file = "notion_client-2.2.1-py2.py3-none-any.whl", hash = "sha256:4ecf9ec527a124462f7bd407d9c9ead9853a9b2c8f00e56f3fa8fb15106ad871"},
 ]
 
 [package.dependencies]
@@ -264,22 +265,22 @@ httpx = ">=0.15.0"
 
 [[package]]
 name = "notional"
-version = "0.8.0"
+version = "0.8.1"
 description = "A high-level interface for the Notion SDK."
 category = "main"
 optional = false
-python-versions = ">=3.8.1,<4.0.0"
+python-versions = "<4.0.0,>=3.8.1"
 files = [
-    {file = "notional-0.8.0-py3-none-any.whl", hash = "sha256:2aad90c1a562e300f03fd42f05c66aac44cb9863e11be3819632464fd2cf95fe"},
-    {file = "notional-0.8.0.tar.gz", hash = "sha256:d19ba4f686439cc01b9133e72d7a0dcede1a137936574be57414ae7f3cd14d57"},
+    {file = "notional-0.8.1-py3-none-any.whl", hash = "sha256:0b225ed679b6314c1782ea2fdc63e38ddfe51842516a704e7c7ae4d4d388ee97"},
+    {file = "notional-0.8.1.tar.gz", hash = "sha256:7dd504ae77dfb3069cde2a1315ecf9521096d87343de1229feb2941addb9a2fd"},
 ]
 
 [package.dependencies]
-emoji = ">=2.2.0,<3.0.0"
+emoji = ">=2.11.0,<3.0.0"
 html5lib = ">=1.1,<2.0"
-notion-client = ">=2.0.0,<3.0.0"
-pydantic = ">=1.10.7,<2.0.0"
-urllib3 = ">=1.26.15,<2.0.0"
+notion-client = ">=2.2.1,<3.0.0"
+pydantic = ">=1.10.15,<2.0.0"
+urllib3 = ">=1.26.18,<2.0.0"
 
 [[package]]
 name = "platformdirs"
@@ -485,18 +486,18 @@ files = [
 
 [[package]]
 name = "urllib3"
-version = "1.26.16"
+version = "1.26.18"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
 files = [
-    {file = "urllib3-1.26.16-py2.py3-none-any.whl", hash = "sha256:8d36afa7616d8ab714608411b4a3b13e58f463aee519024578e062e141dce20f"},
-    {file = "urllib3-1.26.16.tar.gz", hash = "sha256:8f135f6502756bde6b2a9b28989df5fbe87c9970cecaa69041edcce7f0589b14"},
+    {file = "urllib3-1.26.18-py2.py3-none-any.whl", hash = "sha256:34b97092d7e0a3a8cf7cd10e386f401b3737364026c45e622aa02903dffe0f07"},
+    {file = "urllib3-1.26.18.tar.gz", hash = "sha256:f8ecc1bba5667413457c529ab955bf8c67b45db799d159066261719e328580a0"},
 ]
 
 [package.extras]
-brotli = ["brotli (>=1.0.9)", "brotlicffi (>=0.8.0)", "brotlipy (>=0.6.0)"]
+brotli = ["brotli (==1.0.9)", "brotli (>=1.0.9)", "brotlicffi (>=0.8.0)", "brotlipy (>=0.6.0)"]
 secure = ["certifi", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "ipaddress", "pyOpenSSL (>=0.14)", "urllib3-secure-extra"]
 socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
@@ -536,4 +537,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11.5"
-content-hash = "8e661c95e0fb21118b03ee55597a111e9d18c15c744012686d33b705b263114a"
+content-hash = "ca4426d1ff1eba8ba64951717ec2a45eb5c963e987c4ccc66a3c83acbf0d88ba"

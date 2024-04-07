@@ -9,7 +9,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11.5"
 applescript = "^2021.2.9"
-notional = "^0.8.0"
+notional = "^0.8.1"
 click = "^8.1.7"
 pydantic = "^1.10.15"
 pyyaml = "^6.0.1"
