@@ -97,14 +97,14 @@ files = [
 
 [[package]]
 name = "emoji"
-version = "2.11.0"
+version = "2.11.1"
 description = "Emoji for Python"
 category = "main"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
 files = [
-    {file = "emoji-2.11.0-py2.py3-none-any.whl", hash = "sha256:63fc9107f06c6c2e48e5078ce9575cef98518f5ac09474f6148a43e989989582"},
-    {file = "emoji-2.11.0.tar.gz", hash = "sha256:772eaa30f4e0b1ce95148a092df4c7dc97644532c03225326b0fd05e8a9f72a3"},
+    {file = "emoji-2.11.1-py2.py3-none-any.whl", hash = "sha256:b7ba25299bbf520cc8727848ae66b986da32aee27dc2887eaea2bff07226ce49"},
+    {file = "emoji-2.11.1.tar.gz", hash = "sha256:062ff0b3154b6219143f8b9f4b3e5c64c35bc2b146e6e2349ab5f29e218ce1ee"},
 ]
 
 [package.extras]
@@ -265,18 +265,18 @@ httpx = ">=0.15.0"
 
 [[package]]
 name = "notional"
-version = "0.8.1"
+version = "0.8.2"
 description = "A high-level interface for the Notion SDK."
 category = "main"
 optional = false
 python-versions = "<4.0.0,>=3.8.1"
 files = [
-    {file = "notional-0.8.1-py3-none-any.whl", hash = "sha256:0b225ed679b6314c1782ea2fdc63e38ddfe51842516a704e7c7ae4d4d388ee97"},
-    {file = "notional-0.8.1.tar.gz", hash = "sha256:7dd504ae77dfb3069cde2a1315ecf9521096d87343de1229feb2941addb9a2fd"},
+    {file = "notional-0.8.2-py3-none-any.whl", hash = "sha256:fe019759e09ba0c09472003ec89d85933166add12b69693474fdeff973a4a3a7"},
+    {file = "notional-0.8.2.tar.gz", hash = "sha256:58e606699464964a270c4a0f8c2e69c727f6aafe7820297d1baff24ed398bb61"},
 ]
 
 [package.dependencies]
-emoji = ">=2.11.0,<3.0.0"
+emoji = ">=2.11.1,<3.0.0"
 html5lib = ">=1.1,<2.0"
 notion-client = ">=2.2.1,<3.0.0"
 pydantic = ">=1.10.15,<2.0.0"
@@ -537,4 +537,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11.5"
-content-hash = "0700d57e1634d53b2660a92c1fe23f96c46f599ae36bfbc7256ba12d31ae64f2"
+content-hash = "46fb4c050cff557ca8e38b0277635ed1db209ceb7ea5cb1b9973bfbb3d9cb0ab"
