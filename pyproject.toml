@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11.5"
+python = "^3.12.6"
 applescript = "^2021.2.9"
 notional = "^0.8.2"
 click = "^8.1.7"
